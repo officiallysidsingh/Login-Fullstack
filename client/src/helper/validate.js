@@ -12,6 +12,20 @@ export async function passwordValidate(values) {
   return errors;
 }
 
+/* Validate Login Page Reset Password */
+export async function resetPasswordValidate(values) {
+  const errors = passwordVerify({}, values);
+
+  if (values.password !== values.confirm_pwd) {
+    errors.exist = toast.error(
+      "Password and Confirm Password must be same.....!"
+    );
+  }
+  return errors;
+}
+
+/* *********************************************** */
+
 /* Validate Username */
 function usernameVerify(error = {}, values) {
   if (!values.username) {
