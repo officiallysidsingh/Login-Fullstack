@@ -73,6 +73,20 @@ const verifyOTP = asyncHandler(async (req, res) => {
 });
 
 /*
+    @desc    Reset all the variables
+
+    @route   GET /api/createResetSession
+
+    Successfully redirect user when OTP is valid
+*/
+const createResetSession = asyncHandler(async (req, res) => {
+  // const { username, email, password } = req.body;
+  res.json({ message: "createResetSession GET Request" });
+});
+
+// PUT Methods Controllers
+
+/*
     @desc    Update a user
 
     @route   PUT /api/updateUser
@@ -89,19 +103,7 @@ const verifyOTP = asyncHandler(async (req, res) => {
  */
 const updateUser = asyncHandler(async (req, res) => {
   // const { username, email, password } = req.body;
-  res.json({ message: "updatUser PUT Request" });
-});
-
-/*
-    @desc    Reset all the variables
-
-    @route   GET /api/createResetSession
-
-    Successfully redirect user when OTP is valid
-*/
-const createResetSession = asyncHandler(async (req, res) => {
-  // const { username, email, password } = req.body;
-  res.json({ message: "createResetSession GET Request" });
+  res.json({ message: "updateUser PUT Request" });
 });
 
 /*
@@ -115,3 +117,14 @@ const resetPassword = asyncHandler(async (req, res) => {
   // const { username, email, password } = req.body;
   res.json({ message: "resetPassword PUT Request" });
 });
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getUser,
+  generateOTP,
+  verifyOTP,
+  createResetSession,
+  updateUser,
+  resetPassword,
+};
