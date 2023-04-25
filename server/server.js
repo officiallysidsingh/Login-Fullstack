@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const connectDB = require("./config/dbConnection");
+const loginRoute = require("./routes/loginRoute");
+
+// Load env variables
 const dotenv = require("dotenv").config();
 
 // Connect to MongoDB
@@ -22,6 +25,9 @@ app.disable("x-powered-by"); // less hackers know about our stack
 app.get("/", (req, res) => {
   res.status(201).json("Home GET Request");
 });
+
+/* API Routes */
+app.use("/api", loginRoute);
 
 // Start Server
 app.listen(PORT, () => {
