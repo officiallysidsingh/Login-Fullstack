@@ -24,6 +24,15 @@ export async function resetPasswordValidate(values) {
   return errors;
 }
 
+/* Validate Login Page Register Form */
+export async function registerValidate(values) {
+  const errors = usernameVerify({}, values);
+  passwordVerify(errors, values);
+  emailVerify(errors, values);
+
+  return errors;
+}
+
 /* *********************************************** */
 
 /* Validate Username */
@@ -57,6 +66,20 @@ function passwordVerify(errors = {}, values) {
     errors.password = toast.error(
       "Password must have an uppercase letter.....!"
     );
+  }
+  return errors;
+}
+
+/* Validate Email */
+function emailVerify(errors = {}, values) {
+  const emailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+  if (!values.email) {
+    errors.email = toast.error("Email Required.....!");
+  } else if (values.email.includes(" ")) {
+    errors.email = toast.error("Wrong Email.....!");
+  } else if (!emailFormat.test(values.email)) {
+    errors.email = toast.error("Invalid Email.....!");
   }
   return errors;
 }
