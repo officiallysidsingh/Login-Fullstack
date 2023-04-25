@@ -1,6 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const connectDB = require("./config/dbConnection");
+const dotenv = require("dotenv").config();
+
+// Connect to MongoDB
+connectDB();
+
+//PORT
+const PORT = process.env.PORT || 8080;
 
 const app = express();
 
@@ -9,8 +17,6 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("tiny"));
 app.disable("x-powered-by"); // less hackers know about our stack
-
-const PORT = 8080;
 
 // HTTP GET Request
 app.get("/", (req, res) => {
