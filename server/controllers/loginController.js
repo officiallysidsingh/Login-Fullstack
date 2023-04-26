@@ -209,8 +209,24 @@ const createResetSession = asyncHandler(async (req, res) => {
     }
  */
 const updateUser = asyncHandler(async (req, res) => {
-  // const { username, email, password } = req.body;
-  res.json({ message: "updateUser PUT Request" });
+  // Check if user exists
+  const userId = await Login.findById(req.query.id);
+
+  // If user doesn't exist
+  if (!userId) {
+    res.status(404);
+    throw new Error("User Not Found");
+  }
+
+  // If User Exists, Update the User
+  else {
+    const updatedUser = await Login.findByIdAndUpdate(req.query.id, req.body, {
+      new: true,
+    });
+
+    // If user is updated successfully
+    res.status(200).json(updatedUser);
+  }
 });
 
 /*
