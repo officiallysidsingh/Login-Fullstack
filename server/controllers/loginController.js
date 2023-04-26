@@ -133,8 +133,30 @@ const loginUser = asyncHandler(async (req, res) => {
     @route   GET /api/user/:username
 */
 const getUser = asyncHandler(async (req, res) => {
-  // const { username, email, password } = req.body;
-  res.json({ message: "getUser GET Request" });
+  const { username } = req.params;
+
+  //Check if username is present
+  if (!username) {
+    res.status(501);
+    throw new Error("Invalid Username");
+  }
+
+  //Check if user exists
+  const user = await Login.findOne({ username });
+
+  //If user exists
+  if (user) {
+    res.status(200);
+    res.json({
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+      profile: user.profile,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
 });
 
 /*

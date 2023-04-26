@@ -13,6 +13,9 @@ const {
   resetPassword,
 } = require("../controllers/loginController");
 
+/* Verification Middlewares Import */
+const verifyUser = require("../middlewares/verifyUser");
+
 /* POST Methods */
 
 // To register a new user
