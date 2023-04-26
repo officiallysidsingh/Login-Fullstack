@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Login = require("../models/login.model");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // POST Methods Controllers
 
@@ -10,14 +11,10 @@ const bcrypt = require("bcrypt");
     @route   POST /api/register
 
     @param: {
-        "username": "example123",
-        "password": "Admin123",
-        "email": "example@gmail.com",
-        "firstname": "John",
-        "lastname": "Doe",
-        "phone": "1234567890",
-        "address": "1234 Example Street",
-        "profile": ""
+        "username": "example123",     !Required and Unique
+        "password": "Admin123",       !Required
+        "email": "example@gmail.com", !Required and Unique
+        "profile": ""                 Optional
     }
 */
 const registerUser = asyncHandler(async (req, res) => {
@@ -78,8 +75,54 @@ const registerUser = asyncHandler(async (req, res) => {
 
 */
 const loginUser = asyncHandler(async (req, res) => {
-  ////const { username, email, password } = req.body;
-  res.json({ message: "Login POST Request" });
+  const { username, password } = req.body;
+
+  //Check if all the fields are filled
+  if (!username || !password) {
+    res.status(400);
+    throw new Error("Please fill all the fields");
+  }
+
+  //Check if user exists
+  const user = await Login.findOne({ username });
+
+  //If user exists
+  if (user) {
+    //Check if password matches
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    //If password matches
+    if (isMatch) {
+      //Create a JWT token
+      const accessToken = jwt.sign(
+        {
+          userId: user._id,
+          username: user.username,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: "15m",
+        }
+      );
+      return res.status(200).json({
+        message: "User Logged In Successfully",
+        username: user.username,
+        accessToken,
+      });
+    }
+
+    //If password doesn't match
+    else {
+      res.status(400);
+      throw new Error("Password is incorrect");
+    }
+  }
+
+  //If user doesn't exist
+  else {
+    res.status(404);
+    throw new Error("User not found");
+  }
 });
 
 // GET Methods Controllers
