@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
-const Login = require("../models/loginModel");
+const Login = require("../models/login.model");
+const bcrypt = require("bcrypt");
 
 // POST Methods Controllers
 
@@ -20,8 +21,51 @@ const Login = require("../models/loginModel");
     }
 */
 const registerUser = asyncHandler(async (req, res) => {
-  // const { username, email, password } = req.body;
-  res.json({ message: "Register POST Request" });
+  const { username, password, email, profile } = req.body;
+
+  //Check if all the fields are filled
+  if (!username || !password || !email) {
+    res.status(400);
+    throw new Error("Please fill all the fields");
+  }
+
+  //Check if user already exists
+  const existUsername = await Login.findOne({ username });
+  if (existUsername) {
+    res.status(400);
+    throw new Error("Username already exists");
+  }
+
+  //Check if email already exists
+  const existEmail = await Login.findOne({ email });
+  if (existEmail) {
+    res.status(400);
+    throw new Error("Email already exists");
+  }
+
+  //Salting and Hashing the password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  //Create a new user
+  const user = await Login.create({
+    username,
+    password: hashedPassword,
+    email,
+    profile: profile || "",
+  });
+
+  console.log(`User Created: ${user}`);
+
+  //If user is created successfully
+  if (user) {
+    res.status(201).json({ message: "User Created Successfully" });
+  }
+
+  //If user is not created successfully
+  else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
 });
 
 /*
