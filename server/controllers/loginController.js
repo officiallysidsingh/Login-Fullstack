@@ -54,11 +54,9 @@ const registerUser = asyncHandler(async (req, res) => {
     profile: profile || "",
   });
 
-  console.log(`User Created: ${user}`);
-
-  //If user is created successfully
+  //If user is registered successfully
   if (user) {
-    res.status(201).json({ message: "User Created Successfully" });
+    res.status(201).json({ message: "User Registered Successfully" });
   }
 
   //If user is not created successfully
