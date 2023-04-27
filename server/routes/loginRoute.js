@@ -16,6 +16,9 @@ const {
 /* Verification Middlewares Import */
 const verifyUser = require("../middlewares/verifyUser");
 
+/* OTP Local Variable Middlerware */
+const localVariables = require("../middlewares/localVariables");
+
 /* POST Methods */
 
 // To register a new user
@@ -36,7 +39,7 @@ router.route("/login").post(loginUser);
 router.route("/user/:username").get(getUser);
 
 // To generate random OTP
-router.route("/generateOTP").get(generateOTP);
+router.route("/generateOTP").get(localVariables, generateOTP);
 
 // To verify the generated OTP
 router.route("/verifyOTP").get(verifyOTP);

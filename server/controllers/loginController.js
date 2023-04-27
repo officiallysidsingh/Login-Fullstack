@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const Login = require("../models/login.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const otpGenerator = require("otp-generator");
 
 // POST Methods Controllers
 
@@ -165,8 +166,27 @@ const getUser = asyncHandler(async (req, res) => {
     @route   GET /api/generateOTP
 */
 const generateOTP = asyncHandler(async (req, res) => {
-  // const { username, email, password } = req.body;
-  res.json({ message: "generateOTP GET Request" });
+  // Get username from query params
+  const { username } = req.query;
+
+  if (!username) {
+    res.status(400);
+    throw new Error("Invalid Username");
+  }
+
+  // Check if username is present
+  let exist = await Login.findOne({ username });
+  if (!exist) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  req.app.locals.OTP = await otpGenerator.generate(6, {
+    lowerCaseAlphabets: false,
+    upperCaseAlphabets: false,
+    specialChars: false,
+  });
+  res.status(200).json({ code: req.app.locals.OTP });
 });
 
 /*
@@ -175,8 +195,47 @@ const generateOTP = asyncHandler(async (req, res) => {
     @route   GET /api/verifyOTP
 */
 const verifyOTP = asyncHandler(async (req, res) => {
-  // const { username, email, password } = req.body;
-  res.json({ message: "verifyOTP GET Request" });
+  // Get username from query params
+  const { username } = req.query;
+
+  // Check if username is present
+  if (!username) {
+    res.status(400);
+    throw new Error("Invalid Username");
+  }
+
+  // Check if user is present
+  let exist = await Login.findOne({ username });
+
+  // If user is not present
+  if (!exist) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // If user present
+  // Get OTP from query params
+  const { code } = req.query;
+
+  // Check if OTP is present
+  if (!code) {
+    res.status(400);
+    throw new Error("Invalid OTP");
+  }
+
+  // If OTP is present
+  // Check if OTP is valid
+  if (parseInt(req.app.locals.OTP) === parseInt(code)) {
+    req.app.locals.OTP = null; // Reset OTP
+    req.app.locals.resetSession = true; // Start Session for Reset Password
+    return res.status(200).json({ message: "OTP Verified Successfully" });
+  }
+
+  // If OTP is invalid
+  else {
+    res.status(400);
+    throw new Error("Invalid OTP");
+  }
 });
 
 /*
