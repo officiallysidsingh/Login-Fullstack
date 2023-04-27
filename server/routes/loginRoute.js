@@ -47,7 +47,7 @@ router.route("/createResetSession").get(createResetSession);
 /* PUT Methods */
 
 // To update the user profile
-router.route("/updateUser").put(updateUser);
+router.route("/updateUser").put(verifyUser, updateUser);
 
 // To reset the password
 router.route("/resetPassword").put(resetPassword);

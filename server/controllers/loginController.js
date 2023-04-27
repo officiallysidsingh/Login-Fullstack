@@ -101,7 +101,7 @@ const loginUser = asyncHandler(async (req, res) => {
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-          expiresIn: "15m",
+          expiresIn: "30s",
         }
       );
       return res.status(200).json({
@@ -225,7 +225,13 @@ const updateUser = asyncHandler(async (req, res) => {
     });
 
     // If user is updated successfully
-    res.status(200).json(updatedUser);
+    res.status(201).json({
+      message: "Record Updated Successfully",
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      profile: updatedUser.profile,
+    });
   }
 });
 
