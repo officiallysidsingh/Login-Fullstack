@@ -246,8 +246,13 @@ const verifyOTP = asyncHandler(async (req, res) => {
     Successfully redirect user when OTP is valid
 */
 const createResetSession = asyncHandler(async (req, res) => {
-  // const { username, email, password } = req.body;
-  res.json({ message: "createResetSession GET Request" });
+  if (req.app.locals.resetSession) {
+    req.app.locals.resetSession = false; // Allow access to this route only once
+    return res.status(201).json({ message: "Access Granted!" });
+  } else {
+    res.status(440);
+    throw new Error("Session Expired!");
+  }
 });
 
 // PUT Methods Controllers
