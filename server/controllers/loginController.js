@@ -101,7 +101,7 @@ const loginUser = asyncHandler(async (req, res) => {
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-          expiresIn: "30s",
+          expiresIn: "15m",
         }
       );
       return res.status(200).json({
@@ -209,18 +209,26 @@ const createResetSession = asyncHandler(async (req, res) => {
     }
  */
 const updateUser = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+
+  // Check if user id is present
+  if (!userId) {
+    res.status(400);
+    throw new Error("Invalid User Id");
+  }
+
   // Check if user exists
-  const userId = await Login.findById(req.query.id);
+  const user = await Login.findById(userId);
 
   // If user doesn't exist
-  if (!userId) {
+  if (!user) {
     res.status(404);
     throw new Error("User Not Found");
   }
 
   // If User Exists, Update the User
   else {
-    const updatedUser = await Login.findByIdAndUpdate(req.query.id, req.body, {
+    const updatedUser = await Login.findByIdAndUpdate(userId, req.body, {
       new: true,
     });
 
