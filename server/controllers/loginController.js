@@ -251,7 +251,7 @@ const createResetSession = asyncHandler(async (req, res) => {
     return res.status(201).json({ message: "Access Granted!" });
   } else {
     res.status(440);
-    throw new Error("Session Expired!");
+    res.json("Session Expired!");
   }
 });
 
@@ -315,35 +315,45 @@ const updateUser = asyncHandler(async (req, res) => {
     Update the password once the OTP is verified and the session is created
 */
 const resetPassword = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
-
-  // Check if username && password is present
-  if (!username || !password) {
-    res.status(400);
-    throw new Error("Invalid Username or Password");
+  // If session is expired
+  if (!req.app.locals.resetSession) {
+    res.status(440);
+    res.json({ message: "Session Expired" });
   }
 
-  // Check if user exists
-  const user = await Login.findOne({ username });
-
-  // If user doesn't exist
-  if (!user) {
-    res.status(404);
-    throw new Error("User Not Found");
-  }
-
-  // If user exists
+  // If session is not expired
   else {
-    //Hash the recieved password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { username, password } = req.body;
 
-    //Update the password
-    const updatedUser = await Login.findByIdAndUpdate(
-      user._id,
-      { password: hashedPassword },
-      { new: true }
-    );
-    res.status(201).json({ message: "Password Updated Successfully" });
+    // Check if username && password is present
+    if (!username || !password) {
+      res.status(400);
+      throw new Error("Invalid Username or Password");
+    }
+
+    // Check if user exists
+    const user = await Login.findOne({ username });
+
+    // If user doesn't exist
+    if (!user) {
+      res.status(404);
+      throw new Error("User Not Found");
+    }
+
+    // If user exists
+    else {
+      //Hash the recieved password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      //Update the password
+      const updatedUser = await Login.findByIdAndUpdate(
+        user._id,
+        { password: hashedPassword },
+        { new: true }
+      );
+      res.app.locals.resetSession = false; // Reset the session
+      res.status(201).json({ message: "Password Updated Successfully" });
+    }
   }
 });
 
