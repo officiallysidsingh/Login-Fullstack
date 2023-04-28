@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-// Controllers
+// Controllers For Login
 const {
   registerUser,
   loginUser,
@@ -12,6 +12,9 @@ const {
   updateUser,
   resetPassword,
 } = require("../controllers/loginController");
+
+// Controllers For Mail
+const mailer = require("../controllers/mailer");
 
 /* Verification Middlewares Import */
 const verifyUser = require("../middlewares/verifyUser");
@@ -25,7 +28,7 @@ const localVariables = require("../middlewares/localVariables");
 router.route("/register").post(registerUser);
 
 // Send the email
-// router.route("/registerMail").post((req, res) => {});
+router.route("/registerMail").post(mailer);
 
 // To authenticate a user
 // router.route("/authenticate").post((req, res) => {});
