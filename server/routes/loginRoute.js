@@ -31,7 +31,7 @@ router.route("/register").post(registerUser);
 router.route("/registerMail").post(mailer);
 
 // To authenticate a user
-// router.route("/authenticate").post((req, res) => {});
+router.route("/authenticate").post((req, res) => res.end());
 
 // To login in the app
 router.route("/login").post(loginUser);
