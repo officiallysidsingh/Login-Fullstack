@@ -166,21 +166,6 @@ const getUser = asyncHandler(async (req, res) => {
     @route   GET /api/generateOTP
 */
 const generateOTP = asyncHandler(async (req, res) => {
-  // Get username from query params
-  const { username } = req.query;
-
-  if (!username) {
-    res.status(400);
-    throw new Error("Invalid Username");
-  }
-
-  // Check if username is present
-  let exist = await Login.findOne({ username });
-  if (!exist) {
-    res.status(404);
-    throw new Error("User not found");
-  }
-
   req.app.locals.OTP = await otpGenerator.generate(6, {
     lowerCaseAlphabets: false,
     upperCaseAlphabets: false,
@@ -195,24 +180,6 @@ const generateOTP = asyncHandler(async (req, res) => {
     @route   GET /api/verifyOTP
 */
 const verifyOTP = asyncHandler(async (req, res) => {
-  // Get username from query params
-  const { username } = req.query;
-
-  // Check if username is present
-  if (!username) {
-    res.status(400);
-    throw new Error("Invalid Username");
-  }
-
-  // Check if user is present
-  let exist = await Login.findOne({ username });
-
-  // If user is not present
-  if (!exist) {
-    res.status(404);
-    throw new Error("User not found");
-  }
-
   // If user present
   // Get OTP from query params
   const { code } = req.query;
@@ -324,12 +291,6 @@ const resetPassword = asyncHandler(async (req, res) => {
   // If session is not expired
   else {
     const { username, password } = req.body;
-
-    // Check if username && password is present
-    if (!username || !password) {
-      res.status(400);
-      throw new Error("Invalid Username or Password");
-    }
 
     // Check if user exists
     const user = await Login.findOne({ username });

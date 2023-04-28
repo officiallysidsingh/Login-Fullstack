@@ -19,6 +19,9 @@ const mailer = require("../controllers/mailer");
 /* Verification Middlewares Import */
 const verifyUser = require("../middlewares/verifyUser");
 
+/* User Exists Middleware Import */
+const userExist = require("../middlewares/userExist");
+
 /* OTP Local Variable Middlerware */
 const localVariables = require("../middlewares/localVariables");
 
@@ -31,10 +34,10 @@ router.route("/register").post(registerUser);
 router.route("/registerMail").post(mailer);
 
 // To authenticate a user
-router.route("/authenticate").post((req, res) => res.end());
+router.route("/authenticate").post(userExist, (req, res) => res.end());
 
 // To login in the app
-router.route("/login").post(loginUser);
+router.route("/login").post(userExist, loginUser);
 
 /* GET Methods */
 
@@ -42,10 +45,10 @@ router.route("/login").post(loginUser);
 router.route("/user/:username").get(getUser);
 
 // To generate random OTP
-router.route("/generateOTP").get(localVariables, generateOTP);
+router.route("/generateOTP").get(userExist, localVariables, generateOTP);
 
 // To verify the generated OTP
-router.route("/verifyOTP").get(verifyOTP);
+router.route("/verifyOTP").get(userExist, verifyOTP);
 
 // Reset all the variables
 router.route("/createResetSession").get(createResetSession);
@@ -56,6 +59,6 @@ router.route("/createResetSession").get(createResetSession);
 router.route("/updateUser").put(verifyUser, updateUser);
 
 // To reset the password
-router.route("/resetPassword").put(resetPassword);
+router.route("/resetPassword").put(userExist, resetPassword);
 
 module.exports = router;
