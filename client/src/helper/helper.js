@@ -74,3 +74,34 @@ export const updateUser = async (response) => {
     return Promise.reject({ error: "Couldn't Update Profile...!" });
   }
 };
+
+/* Generate OTP Function */
+
+export const generateOTP = async (username) => {
+  try {
+    const {
+      data: { code },
+      status,
+    } = await axios.get("/api/generateOTP", {
+      params: { username },
+    });
+
+    if (status === 200) {
+      let {
+        data: { email },
+      } = await getUser({ username });
+
+      let text = `Your Password Recovery OTP is ${code}`;
+
+      await axios.post("/api/registerMail", {
+        username,
+        userEmail: email,
+        text,
+        subject: "Password Recovery OTP",
+      });
+    }
+    return Promise.resolve(code);
+  } catch (error) {
+    return Promise.reject({ error });
+  }
+};
