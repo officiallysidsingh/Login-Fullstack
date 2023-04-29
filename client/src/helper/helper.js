@@ -105,3 +105,17 @@ export const generateOTP = async (username) => {
     return Promise.reject({ error });
   }
 };
+
+/* Verify OTP Function */
+
+export const verifyOTP = async ({ username, code }) => {
+  try {
+    const { data, status } = await axios.get("/api/verifyOTP", {
+      params: { username, code },
+    });
+
+    return { data, status };
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
