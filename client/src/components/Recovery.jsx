@@ -1,10 +1,51 @@
-import React from "react";
-import { Toaster } from "react-hot-toast";
+import React, { useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useAuthStore } from "../store/store";
+import { generateOTP, verifyOTP } from "../helper/helper";
+import { useNavigate } from "react-router-dom";
 
 // Import CSS
 import styles from "../styles/UserName.module.css";
 
 export default function Recovery() {
+  const { username } = useAuthStore((state) => state.auth);
+  const [OTP, setOTP] = useState();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    generateOTP(username).then((OTP) => {
+      if (OTP) return toast.success("OTP sent to your email address.");
+      return toast.error("Something went wrong. Please try again.");
+    });
+  }, [username]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      let { status } = await verifyOTP({ username, code: OTP });
+
+      if (status === 200) {
+        toast.success("OTP verified successfully.");
+        return navigate("/reset");
+      }
+    } catch (error) {
+      return toast.error("OTP verification failed. Wrong OTP...!");
+    }
+  };
+
+  /* Function to Resend OTP */
+  const resendOTP = async () => {
+    let sendPromise = generateOTP(username);
+
+    toast.promise(sendPromise, {
+      loading: "Sending OTP...",
+      success: <b>OTP has been sent to your email successfully...!</b>,
+      error: <b>Something went wrong. Please try again...!</b>,
+    });
+  };
+
   return (
     <div className="container mx-auto">
       <Toaster position="top-center" reverseOrder={false} />
@@ -18,7 +59,7 @@ export default function Recovery() {
             </span>
           </div>
 
-          <form className="pt-20">
+          <form className="pt-20" onSubmit={handleSubmit}>
             <div className="textbox flex flex-col items-center gap-6">
               <div className="input text-center">
                 <span className="py-4 text-sm text-left text-gray-500">
@@ -28,6 +69,7 @@ export default function Recovery() {
                   className={styles.textbox}
                   type="text"
                   placeholder="OTP"
+                  onChange={(e) => setOTP(e.target.value)}
                 />
               </div>
               <button className={`${styles.btn} bg-indigo-500`} type="submit">
@@ -37,7 +79,14 @@ export default function Recovery() {
 
             <div className="text-center py-4">
               <span className="text-gray-500">
-                Can't get OTP? <button className="text-red-500">Resend</button>
+                Can't get OTP?{" "}
+                <button
+                  onClick={resendOTP}
+                  className="text-red-500"
+                  type="button"
+                >
+                  Resend
+                </button>
               </span>
             </div>
           </form>
