@@ -23,6 +23,7 @@ export default function UserName() {
     validateOnChange: false,
     onSubmit: async (values) => {
       setUsername(values.username);
+      navigate("/password");
     },
   });
 
