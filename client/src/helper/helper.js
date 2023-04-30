@@ -10,7 +10,7 @@ export const authenticate = async (username) => {
     const res = await axios.post("/api/authenticate", { username });
     return res.data;
   } catch (error) {
-    return { error: "Username doesn't exist" };
+    return error.response.status;
   }
 };
 
