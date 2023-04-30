@@ -153,6 +153,10 @@ const getUser = asyncHandler(async (req, res) => {
       username: user.username,
       email: user.email,
       profile: user.profile,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      mobile: user.mobile,
+      address: user.address,
     });
   } else {
     res.status(404);
