@@ -1,29 +1,43 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import avatar from "../assets/profile.png";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useFormik } from "formik";
 import { passwordValidate } from "../helper/validate";
 import useFetch from "../hooks/useFetch";
 import { useAuthStore } from "../store/store";
+import { loginUser } from "../helper/helper";
 
 // Import CSS
 import styles from "../styles/UserName.module.css";
 
 export default function Password() {
+  const navigate = useNavigate();
+
   const { username } = useAuthStore((state) => state.auth);
 
   const [{ isLoading, apiData, serverError }] = useFetch(`/user/${username}`);
 
   const formik = useFormik({
     initialValues: {
-      password: "Admin@123",
+      password: "Admin123@",
     },
     validate: passwordValidate,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      console.log(values);
+      let loginPromise = loginUser({ username, password: values.password });
+      toast.promise(loginPromise, {
+        loading: "Checking...",
+        success: <b>Login Successfully...!</b>,
+        error: <b>Password Didn't Match</b>,
+      });
+
+      loginPromise.then((res) => {
+        let token = res.accessToken;
+        localStorage.setItem("token", token);
+        navigate("/profile");
+      });
     },
   });
 
