@@ -1,8 +1,19 @@
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_SERVER_URI;
 
 /* Make API Request */
+
+/* Get Username from Token */
+
+export const getUsername = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return Promise.return("Cannot Find Token...!");
+
+  let decode = jwt_decode(token);
+  return decode;
+};
 
 /* Authenticate Function */
 export const authenticate = async (username) => {

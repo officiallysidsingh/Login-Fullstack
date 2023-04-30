@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import avatar from "../assets/profile.png";
 import toast, { Toaster } from "react-hot-toast";
 import { useFormik } from "formik";
 import { profileValidate } from "../helper/validate";
 import convertToBase64 from "../helper/convert";
 import useFetch from "../hooks/useFetch";
-import { useAuthStore } from "../store/store";
 import { updateUser } from "../helper/helper";
 
 // Import CSS
@@ -16,8 +15,9 @@ import extend from "../styles/Profile.module.css";
 export default function Profile() {
   const [file, setFile] = useState();
 
-  const { username } = useAuthStore((state) => state.auth);
-  const [{ isLoading, apiData, serverError }] = useFetch(`/user/${username}`);
+  const [{ isLoading, apiData, serverError }] = useFetch();
+
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -49,6 +49,12 @@ export default function Profile() {
   const onUpload = async (e) => {
     const base64 = await convertToBase64(e.target.files[0]);
     setFile(base64);
+  };
+
+  //Logout Handler Function
+  const userLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   if (isLoading) {
@@ -136,9 +142,9 @@ export default function Profile() {
             <div className="text-center py-4">
               <span className="text-gray-500">
                 Come Back Later?{" "}
-                <Link className="text-red-500" to="/">
+                <button className="text-red-500" onClick={userLogout}>
                   Logout
-                </Link>
+                </button>
               </span>
             </div>
           </form>
